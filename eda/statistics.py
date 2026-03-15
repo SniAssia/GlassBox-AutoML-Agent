@@ -53,6 +53,7 @@ def skewness(x, mu=None, sigma=None):
     z = (x - mu) / sigma
     return np.sum(z ** 3) * (n / ((n - 1) * (n - 2)))
 
+# Sample excess kurtosis
 def kurtosis(x, mu=None, sigma=None):
     x = np.asarray(x, dtype=float)
     n = x.size
@@ -71,5 +72,4 @@ def kurtosis(x, mu=None, sigma=None):
     c1 = n * (n + 1) / ( (n - 1) * (n - 2) * (n - 3) )
     c2 = 3 * (n - 1) ** 2 / ( (n - 2) * (n - 3) )
     return c1 * np.sum(z ** 4) - c2
-
 
