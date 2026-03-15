@@ -1,5 +1,4 @@
 import numpy as np
-import statistics
 
 def mean(x):
     x = np.asarray(x, dtype=float)
