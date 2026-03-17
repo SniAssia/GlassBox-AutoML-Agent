@@ -6,6 +6,7 @@ import numpy as np
 from eda.statistics import stdev, mean 
 
 
+# StandardScaler scaler is very sensitive in the presence of outliers
 class StandardScaler:
     def __init__(self):
         self.mean_ = None
@@ -25,5 +26,5 @@ class StandardScaler:
         std_safe = np.where(self.stadev_ == 0, 1, self.stadev_)
         return (X - self.mean_) / std_safe
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
+    def fit_transform(self, X_train):
+        return self.fit(X_train).transform(X_train)

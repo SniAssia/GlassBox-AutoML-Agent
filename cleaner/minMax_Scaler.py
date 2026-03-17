@@ -2,6 +2,8 @@
 # fit is just calculating min and max for later scaling (i bring this from eda package again) [only for training data]
 # transform is just applying the transformation to a matrix -> i return a transformed array [transform any data, test or train]
 
+
+# minMax scaler is very sensitive in the presence of outliers
 import numpy as np
 from eda.statistics import min_val, max_val
 
@@ -25,5 +27,5 @@ class MinMaxScaler:
         range_safe = np.where((self.max_ - self.min_) == 0, 1, self.max_ - self.min_)
         return (X - self.min_) / range_safe
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
+    def fit_transform(self, X_train):
+        return self.fit(X_train).transform(X_train)
