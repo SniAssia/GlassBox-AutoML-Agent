@@ -72,3 +72,23 @@ def kurtosis(x, mu=None, sigma=None):
     c2 = 3 * (n - 1) ** 2 / ( (n - 2) * (n - 3) )
     return c1 * np.sum(z ** 4) - c2
 
+
+
+# Soufiane comment: you forgot min and max. I added them because i need them in minMaxScaler
+
+def min_val(x):
+    # x is a 1D numerical ndarray
+    minimum = x[0]
+    for val in x[1:]:
+        if val < minimum:
+            minimum = val
+    return minimum
+
+
+def max_val(x):
+    # x is a 1D numerical ndarray
+    maximum = x[0]
+    for val in x[1:]:
+        if val > maximum:
+            maximum = val
+    return maximum

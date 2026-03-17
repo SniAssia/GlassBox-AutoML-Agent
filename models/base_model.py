@@ -37,10 +37,15 @@ class BaseModel(ABC):
         predictions : array-like
         """
         pass
-
     def score(self, X, y):
-        """
-        Default scoring: accuracy for classification
-        """
+
         y_pred = self.predict(X)
-        return np.mean(y_pred == y)  # fraction of correct predictions
+
+        if self.task == "classification":
+            return np.mean(y_pred == y)  # accuracy
+
+        elif self.task == "regression":
+            return np.mean((y - y_pred) ** 2)  # MSE
+
+        else:
+            raise ValueError("Unsupported task type")
