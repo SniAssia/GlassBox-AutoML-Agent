@@ -1,0 +1,12 @@
+{
+  "name": "autofit",
+  "description": "Run AutoML pipeline on CSV data",
+  "allow_http": false,
+  "allow_filesystem": ["read"],
+  "required_secrets": [],
+  "parameters": {
+    "csv_path": { "type": "string" },
+    "target_column": { "type": "string" },
+    "search_strategy": { "type": "string", "enum": ["grid", "random"] }
+  }
+}
