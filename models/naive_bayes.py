@@ -12,6 +12,7 @@ class GaussianNaiveBayes(BaseModel):
         # Portion of the largest variance of all features that is added to 
         # variances for calculation stability.
         self.var_smoothing = var_smoothing
+        self.task = 'classification'
         self.classes = None
         #the Prior for a class is simply the percentage of the training data that belongs to that class.
         self.parameters = [] # List of dicts containing mean, var, and prior per class
@@ -53,7 +54,7 @@ class GaussianNaiveBayes(BaseModel):
             #P(C)
             prior = np.log(self.parameters[i]["prior"])
             #P(x/C)
-            likelihood = np.sum(np.log(self._calculate_likelihood(i, x)))
+            likelihood = np.sum(np.log(self._calculate_likelihood(i, x) + 1e-12))
             posterior = prior + likelihood
             posteriors.append(posterior)
 

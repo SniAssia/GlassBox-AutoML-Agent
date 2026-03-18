@@ -38,14 +38,16 @@ class BaseModel(ABC):
         """
         pass
     def score(self, X, y):
-
+        task = getattr(self, "task", None)
+        if task is None:
+            raise ValueError("Model must define self.task as 'classification' or 'regression'")
         y_pred = self.predict(X)
 
-        if self.task == "classification":
+        if task == "classification":
             return np.mean(y_pred == y)  # accuracy
 
-        elif self.task == "regression":
-            return np.mean((y - y_pred) ** 2)  # MSE
+        elif task == "regression":
+            return -np.mean((y - y_pred) ** 2)  # negative MSE for max-based search
 
         else:
             raise ValueError("Unsupported task type")

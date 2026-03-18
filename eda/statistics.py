@@ -17,7 +17,7 @@ def median(x):
     return (x[mid - 1] + x[mid]) / 2
 
 def mode(x):
-    x = np.asarray(x, dtype=float)
+    x = np.asarray(x)
     if x.size == 0: 
         raise ValueError("mode requires at least one value")
     values, counts = np.unique(x, return_counts=True)
