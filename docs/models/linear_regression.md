@@ -1,5 +1,5 @@
 # Linear Regression — Theory Notes
-*author: @Soufiane AIT LHADJ*
+
 ---
 
 ## 1. The Model
@@ -229,3 +229,155 @@ Where $\alpha$ is the **learning rate** — controls the step size at each itera
 | **Epoch** | One full pass through the entire training dataset |
 
 In **Batch Gradient Descent** (our implementation), one epoch = one iteration, because we use all $m$ samples to compute the gradient before each update.
+
+---
+
+## 9. Usage Examples
+
+### Basic usage — Gradient Descent
+
+```python
+from models.linear_regression import LinearRegression
+import numpy as np
+
+X_train = np.array([[1.0, 2.0],
+                    [2.0, 3.0],
+                    [3.0, 4.0],
+                    [4.0, 5.0]])
+
+y_train = np.array([5.0, 8.0, 11.0, 14.0])
+
+model = LinearRegression(solver='gd', lr=0.01, n_epochs=1000)
+model.fit(X_train, y_train)
+
+X_test = np.array([[5.0, 6.0]])
+predictions = model.predict(X_test)
+
+print(predictions)       # → [17.0] (approximately)
+print(model.w_)          # → [bias, w1, w2]
+print(model.costs_[-1])  # → final cost after training
+```
+
+---
+
+### Basic usage — Normal Equation
+
+```python
+from models.linear_regression import LinearRegression
+import numpy as np
+
+X_train = np.array([[1.0, 2.0],
+                    [2.0, 3.0],
+                    [3.0, 4.0],
+                    [4.0, 5.0]])
+
+y_train = np.array([5.0, 8.0, 11.0, 14.0])
+
+model = LinearRegression(solver='normal')
+model.fit(X_train, y_train)
+
+X_test = np.array([[5.0, 6.0]])
+predictions = model.predict(X_test)
+
+print(predictions)   # → [17.0] (exact)
+print(model.w_)      # → [bias, w1, w2]
+# model.costs_ is empty — no iterations with the normal equation
+```
+
+---
+
+### Choosing between solvers
+
+```python
+# small dataset, few features → normal equation is faster and exact
+model = LinearRegression(solver='normal')
+
+# large dataset, many features → gradient descent scales better
+model = LinearRegression(solver='gd', lr=0.01, n_epochs=2000)
+```
+
+---
+
+### Inspecting convergence
+
+```python
+import matplotlib.pyplot as plt
+
+model = LinearRegression(solver='gd', lr=0.01, n_epochs=500)
+model.fit(X_train, y_train)
+
+# plot the cost curve to verify gradient descent is converging
+plt.plot(model.costs_)
+plt.xlabel('Epoch')
+plt.ylabel('Cost (MSE)')
+plt.title('Learning curve')
+plt.show()
+```
+
+> If the cost curve is decreasing smoothly and flattening out, gradient descent is working correctly.
+> If it oscillates or increases, the learning rate `lr` is too high — reduce it.
+
+---
+
+### Early stopping behaviour
+
+```python
+# tol controls early stopping — training stops when cost improvement < tol
+model = LinearRegression(solver='gd', lr=0.01, n_epochs=10000, tol=1e-6)
+model.fit(X_train, y_train)
+# → "Converged at epoch 243"  (stops early instead of running all 10000 epochs)
+```
+
+---
+
+### Using in a full GlassBox pipeline
+
+```python
+from cleaner.simple_imputer import SimpleImputer
+from cleaner.standard_scaler import StandardScaler
+from models.linear_regression import LinearRegression
+import numpy as np
+
+# raw data with missing values
+X_raw = np.array([[1.0, np.nan],
+                  [2.0, 3.0  ],
+                  [np.nan, 4.0],
+                  [4.0, 5.0  ]])
+y = np.array([3.0, 5.0, 7.0, 9.0])
+
+# step 1 — impute missing values
+imputer = SimpleImputer()
+X_imputed = imputer.fit_transform(X_raw)
+
+# step 2 — scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_imputed)
+
+# step 3 — train model
+model = LinearRegression(solver='gd', lr=0.1, n_epochs=1000)
+model.fit(X_scaled, y)
+
+# step 4 — predict on new data (apply same pipeline)
+X_new = np.array([[3.0, 6.0]])
+X_new_imputed = imputer.transform(X_new)
+X_new_scaled  = scaler.transform(X_new_imputed)
+print(model.predict(X_new_scaled))
+```
+
+> Always apply `transform()` — never `fit_transform()` — on test or new data. The imputer and scaler must use statistics learned from training data only.
+
+---
+
+### Accessing learned weights
+
+```python
+model = LinearRegression(solver='gd')
+model.fit(X_train, y_train)
+
+bias      = model.w_[0]     # intercept (absorbed into w_)
+weights   = model.w_[1:]    # one weight per feature
+
+print(f"Bias: {bias:.4f}")
+for i, w in enumerate(weights):
+    print(f"w{i+1}: {w:.4f}")
+```
