@@ -145,7 +145,7 @@ These are called the **normal equations**. If $X^TX$ is invertible, we multiply 
 
 $$\boxed{\mathbf{w} = (X^TX)^{-1}X^T\mathbf{y}}$$
 
-This gives the exact optimal weights **in one shot**, with no iterations. ✅
+This gives the exact optimal weights **in one shot**, with no iterations.
 
 ---
 

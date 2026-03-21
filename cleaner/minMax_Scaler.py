@@ -1,4 +1,4 @@
-# MinMax scaler : is (x - x_min) / (x_max - x_min)
+# MinMax scaler : is (z - x_min) / (x_max - x_min)
 # fit is just calculating min and max for later scaling (i bring this from eda package again) [only for training data]
 # transform is just applying the transformation to a matrix -> i return a transformed array [transform any data, test or train]
 

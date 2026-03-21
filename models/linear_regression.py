@@ -1,5 +1,5 @@
 # Linear Regression : predicts a continuous target using f(x) = Xw (bias absorbed into w via column of ones)
-# fit : learns weights w using gradient descent or normal equation
+# fit : learns weights w using gradient descent or normal (closed form) equation
 # predict : returns predictions for any X
 # supports solver='gd' (gradient descent) or solver='normal' (closed form normal equation)
 
