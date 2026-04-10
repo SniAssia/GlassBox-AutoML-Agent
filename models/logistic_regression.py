@@ -14,6 +14,7 @@ class LogisticRegression(BaseModel):
         # n_epochs  : maximum number of gradient descent iterations
         # tol       : early stopping — stop if cost improvement < tol
         # threshold : decision boundary for binary prediction (used in OvR voting)
+        self.task = 'classification'
         self.lr        = lr
         self.n_epochs  = n_epochs
         self.tol       = tol

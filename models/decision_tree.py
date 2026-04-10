@@ -11,14 +11,15 @@ class Node:
         self.samples_count = samples_count # counts how many samples reached the node
         self.impurity = impurity # counts how pure this node is
 
-
-
 class DecisionTree(BaseModel):
     def __init__(self, max_depth=10, min_samples_split=2, n_features=None, task='classification'):
-        if max_depth < 1:
+        # On vérifie d'abord si c'est None avant de comparer
+        if max_depth is not None and max_depth < 1:
             raise ValueError('max_depth must be >= 1')
+            
         if min_samples_split < 2:
             raise ValueError('min_samples_split must be >= 2')
+        # ... reste du init ...
         if task not in ('classification', 'regression'):
             raise ValueError("task must be 'classification' or 'regression'")
 
@@ -70,16 +71,22 @@ class DecisionTree(BaseModel):
         X = np.asarray(X)
         return np.array([self._traverse_tree(x, self.root) for x in X])
 
+    # Dans models/decision_tree.py
+
     def _grow_tree(self, X, y, depth=0):
         n_samples, n_features = X.shape
         is_pure = self._is_pure(y)
 
-        # Stopping conditions
-        if (depth >= self.max_depth or 
+        # --- MODIFICATION ICI ---
+        # On vérifie si max_depth est atteint SEULEMENT s'il n'est pas None
+        depth_reached = (self.max_depth is not None and depth >= self.max_depth)
+        
+        if (depth_reached or 
             n_samples < self.min_samples_split or 
             is_pure):
             leaf_value = self._leaf_value(y)
             return Node(prediction=leaf_value, samples_count=n_samples)
+        # -------------------------
 
         # Randomly select features to consider for splitting
         feature_indices = np.random.choice(n_features, self._resolved_n_features, replace=False)

@@ -1,68 +1,66 @@
 import numpy as np
-from eda.statistics import median, mean, stdev, mode
-
+from eda.statistics import EDA  # On importe la classe EDA
 
 class SimpleImputer:
-
-    def __init__(self, method = 'mean'):
-        # mathod is 'mean' or 'median' if column is numeric 
-        # categorical columns are imputed with 'mode' (most frequent category)
-
+    def __init__(self, method='mean'):
         if method not in ('mean', 'median'):
             raise ValueError("method must be either 'mean' or 'median'")
         self.method_ = method
         self.fill_values_ = None
+        self.eda = EDA()
 
-    def _is_missing(self,col):
-        """this returns a boolean array of the same size as col. It indicates with True where missings values are, i.e np.nan or None"""
-        return np.array([v is None or(isinstance(v,float) and np.isnan(v)) for v in col])
+    def _is_missing(self, col):
+        return np.array([
+            v is None or 
+            (isinstance(v, float) and np.isnan(v)) or 
+            (isinstance(v, str) and str(v).strip() == "") 
+            for v in col
+        ])
     
-    def _is_numeric(self, col):
-        """this removes missing values from the column, then tries to cast it to float. 
-            If it succeeds → numerical. If it throws an error (e.g. column contains strings like "cat") => categorical."""
-        try: 
-            col_clean = col[~self._is_missing(col)] # It contains only values that were false when applying _is_mising
-            col_clean.astype(float)
-            return True
-        
-        except (ValueError,TypeError):
-            return False
-        
-    def fit(self, X):
-        # learns one fill value per column from training data
-        # numerical columns → mean or median depending on self.method
-        # categorical columns → mode always
-        # stores results in fill_values_ (one value per column)
+    # AJOUT de col_types ici pour correspondre à l'appel de l'Orchestrateur
+    def fit(self, X, col_types=None):
         self.fill_values_ = []
+        X = np.asarray(X)
+        
         for i in range(X.shape[1]):
             col = X[:, i]
             missing_mask = self._is_missing(col)
-            if self._is_numeric(col):
-                col_clean = col[~missing_mask].astype(float)
-                if self.method_ == 'mean':
-                    self.fill_values_.append(mean(col_clean))
-                elif self.method_ == 'median':
-                    self.fill_values_.append(median(col_clean))
+            col_clean = col[~missing_mask]
+
+            if col_clean.size == 0:
+                self.fill_values_.append(0)
+                continue
+
+            # On utilise col_types s'il est fourni, sinon on devine
+            is_num = False
+            if col_types is not None:
+                is_num = (col_types[i] == "numerical")
             else:
-                col_clean = col[~missing_mask]
-                self.fill_values_.append(mode(col_clean))
+                try:
+                    col_clean.astype(float)
+                    is_num = True
+                except:
+                    is_num = False
+
+            if is_num:
+                col_numeric = col_clean.astype(float)
+                if self.method_ == 'mean':
+                    self.fill_values_.append(self.eda.mean(col_numeric))
+                elif self.method_ == 'median':
+                    self.fill_values_.append(self.eda.median(col_numeric))
+            else:
+                self.fill_values_.append(self.eda.mode(col_clean))
         return self
     
     def transform(self, X):
-        # fills missing values (np.nan or None) in each column using the stored fill_values_
-        # works on a copy of X to avoid modifying the original data
         if self.fill_values_ is None:
             raise RuntimeError("SimpleImputer is not fitted yet. Call fit() first.")
-        X_out = X.copy()
+        X_out = np.copy(X)
         for i in range(X_out.shape[1]):
-            col = X_out[:, i]
-            missing_mask = self._is_missing(col)
+            missing_mask = self._is_missing(X_out[:, i])
             X_out[missing_mask, i] = self.fill_values_[i]
         return X_out
 
-
-    def fit_transform(self, X_train):
-        return self.fit(X_train).transform(X_train)
-
-    def fit_Transform(self, X_train):
-        return self.fit_transform(X_train)
+    # AJOUT de col_types ici aussi
+    def fit_transform(self, X, col_types=None):
+        return self.fit(X, col_types).transform(X)

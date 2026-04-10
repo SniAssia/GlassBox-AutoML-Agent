@@ -1,41 +1,63 @@
-# One Hot Encoder : converts a categorical column into a binary matrix
-# fit : learns the unique categories and creates one column per category [only for training data]
-# transform : returns a binary matrix — 1 where the category matches, 0 elsewhere [transform any data, test or train]
-# unseen categories during transform => a separate 'unknown' column fires instead
-
 import numpy as np
-
 
 class OneHotEncoder:
     def __init__(self):
-        self.classes_ = None      # unique categories learned during fit
-        self.mapping_ = None      # dict : category → column index
+        self.mapping_ = {}  # Stocke les catégories pour chaque index de colonne
+        self.fitted_ = False
 
-    def fit(self, X):
-        # X is a 1D ndarray of categorical values
-        # learns unique categories and assigns each a column index
-        unique = sorted(set(X))
-        self.classes_ = np.array(unique)
-        self.mapping_ = {category: i for i, category in enumerate(unique)}
+    def fit(self, X, col_types=None):
+        """
+        X: Matrice 2D de données.
+        col_types: Liste des types ['numerical', 'categorical', ...]
+        """
+        X = np.asarray(X)
+        self.mapping_ = {}
+        
+        # On parcourt chaque colonne
+        for i in range(X.shape[1]):
+            # On n'encode que si l'Orchestrateur dit que c'est du catégoriel
+            if col_types is not None and col_types[i] == 'categorical':
+                unique_vals = sorted(set(X[:, i]))
+                self.mapping_[i] = {val: idx for idx, val in enumerate(unique_vals)}
+        
+        self.fitted_ = True
         return self
 
     def transform(self, X):
-        # returns a binary matrix of shape (n_samples, n_categories + 1)
-        # last column is the 'unknown' column — fires for unseen categories
-        if self.mapping_ is None:
+        if not self.fitted_:
             raise RuntimeError("OneHotEncoder is not fitted yet. Call fit() first.")
+        
+        X = np.asarray(X)
+        n_samples = X.shape[0]
+        final_cols = []
 
-        n_samples = len(X)
-        n_cols = len(self.classes_) + 1          # +1 for the unknown column
-        out = np.zeros((n_samples, n_cols), dtype=int)
-
-        for i, val in enumerate(X):
-            if val in self.mapping_:
-                out[i, self.mapping_[val]] = 1   # known category → fire its column
+        for i in range(X.shape[1]):
+            col_data = X[:, i]
+            
+            if i in self.mapping_:
+                # Encodage de la colonne catégorielle
+                n_cats = len(self.mapping_[i])
+                # +1 pour la colonne 'unknown' (unseen categories)
+                encoded = np.zeros((n_samples, n_cats + 1), dtype=int)
+                
+                for row_idx, val in enumerate(col_data):
+                    if val in self.mapping_[i]:
+                        encoded[row_idx, self.mapping_[i][val]] = 1
+                    else:
+                        encoded[row_idx, -1] = 1 # Colonne 'unknown'
+                
+                # On ajoute les colonnes encodées une par une
+                for c in range(encoded.shape[1]):
+                    final_cols.append(encoded[:, c])
             else:
-                out[i, -1] = 1                   # unseen category → fire unknown column
+                # Colonne numérique : on la garde telle quelle
+                try:
+                    final_cols.append(col_data.astype(float))
+                except:
+                    # Sécurité si une colonne numérique contient du texte
+                    final_cols.append(np.zeros(n_samples))
 
-        return out
+        return np.column_stack(final_cols)
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
+    def fit_transform(self, X, col_types=None):
+        return self.fit(X, col_types).transform(X)

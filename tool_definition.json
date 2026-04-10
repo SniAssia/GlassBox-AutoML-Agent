@@ -1,0 +1,23 @@
+{
+    "name": "glassbox_autofit",
+    "description": "End-to-end AutoML: cleans data, detects types, and trains the best model with explanation.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "csv_base64": {
+          "type": "string",
+          "description": "Base64 encoded string of the CSV file"
+        },
+        "target_column": {
+          "type": "string",
+          "description": "The name of the column to predict"
+        },
+        "task_type": {
+          "type": "string",
+          "enum": ["classification", "regression"],
+          "description": "The type of ML task"
+        }
+      },
+      "required": ["csv_base64", "target_column", "task_type"]
+    }
+  }
