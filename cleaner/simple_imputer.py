@@ -8,7 +8,9 @@ class SimpleImputer:
         # mathod is 'mean' or 'median' if column is numeric 
         # categorical columns are imputed with 'mode' (most frequent category)
 
-        self.method_ = mean
+        if method not in ('mean', 'median'):
+            raise ValueError("method must be either 'mean' or 'median'")
+        self.method_ = method
         self.fill_values_ = None
 
     def _is_missing(self,col):
@@ -35,13 +37,14 @@ class SimpleImputer:
         for i in range(X.shape[1]):
             col = X[:, i]
             missing_mask = self._is_missing(col)
-            col_clean = col[~missing_mask].astype(float) if self._is_numerical(col) else col[~missing_mask]
-            if self._is_numerical(col):
+            if self._is_numeric(col):
+                col_clean = col[~missing_mask].astype(float)
                 if self.method_ == 'mean':
                     self.fill_values_.append(mean(col_clean))
                 elif self.method_ == 'median':
                     self.fill_values_.append(median(col_clean))
             else:
+                col_clean = col[~missing_mask]
                 self.fill_values_.append(mode(col_clean))
         return self
     
@@ -58,5 +61,8 @@ class SimpleImputer:
         return X_out
 
 
-    def fit_Transform(self, X_train) :
-        return X_train.fit(X_train).transform(X_train)
+    def fit_transform(self, X_train):
+        return self.fit(X_train).transform(X_train)
+
+    def fit_Transform(self, X_train):
+        return self.fit_transform(X_train)

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import numpy as np
 
 
 class BaseModel(ABC):
@@ -36,3 +37,17 @@ class BaseModel(ABC):
         predictions : array-like
         """
         pass
+    def score(self, X, y):
+        task = getattr(self, "task", None)
+        if task is None:
+            raise ValueError("Model must define self.task as 'classification' or 'regression'")
+        y_pred = self.predict(X)
+
+        if task == "classification":
+            return np.mean(y_pred == y)  # accuracy
+
+        elif task == "regression":
+            return -np.mean((y - y_pred) ** 2)  # negative MSE for max-based search
+
+        else:
+            raise ValueError("Unsupported task type")

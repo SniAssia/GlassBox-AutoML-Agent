@@ -3,11 +3,12 @@ from collections import Counter
 from models.base_model import BaseModel
 from models.decision_tree import DecisionTree
 class RandomForest(BaseModel):
-    def __init__(self, n_trees=10, max_depth=10, min_samples_split=2, n_features=None):
+    def __init__(self, n_trees=10, max_depth=10, min_samples_split=2, n_features=None, task='classification'):
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.n_features = n_features
+        self.task = task
         self.trees = []
 
     def fit(self, X, y):
@@ -20,12 +21,14 @@ class RandomForest(BaseModel):
             tree = DecisionTree(
                 max_depth=self.max_depth, 
                 min_samples_split=self.min_samples_split,
-                n_features=self.n_features # Tell tree to only look at some features
+                n_features=self.n_features,
+                task=self.task
             )
             
             # 3. Train the tree on the random sample
             tree.fit(X_sample, y_sample)
             self.trees.append(tree)
+        return self
 
     def _bootstrap_samples(self, X, y): # X features matrix with rows filled 
         n_samples = X.shape[0] # num of rows 
@@ -35,6 +38,8 @@ class RandomForest(BaseModel):
         return X[indices], y[indices]
 
     def predict(self, X): # X matrix of input rows to predict 
+        if not self.trees:
+            raise RuntimeError("RandomForest is not fitted yet. Call fit() first.")
         # 1. Get predictions from every single tree
         # tree_preds shape: (n_trees, n_samples)
         #Each Row of this matrix represents one tree's opinion on all 100 samples.
@@ -47,5 +52,10 @@ class RandomForest(BaseModel):
         tree_preds = np.swapaxes(tree_preds, 0, 1)
         
         # 3. Pick the most common label (Majority Vote)
-        predictions = [Counter(sample_preds).most_common(1)[0][0] for sample_preds in tree_preds]
+        if self.task == 'classification':
+            predictions = [Counter(sample_preds).most_common(1)[0][0] for sample_preds in tree_preds]
+        elif self.task == 'regression':
+            predictions = [np.mean(sample_preds.astype(float)) for sample_preds in tree_preds]
+        else:
+            raise ValueError("task must be 'classification' or 'regression'")
         return np.array(predictions)

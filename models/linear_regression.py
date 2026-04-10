@@ -19,6 +19,7 @@ class LinearRegression(BaseModel):
         self.tol      = tol     # this is my tolearance
         self.w_       = None    # learned weights (includes bias as w[0])
         self.costs_   = []      # cost history per epoch (useful for debugging)
+        self.task     = 'regression'
 
     def _add_bias(self, X):
         # prepends a column of ones to X to absorb the bias into w

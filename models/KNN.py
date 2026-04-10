@@ -1,34 +1,22 @@
 import numpy as np
-from base_model import BaseModel
+from models.base_model import BaseModel
 
 
 class KNearestNeighbors(BaseModel):
+    #task = classification or regression
 
-    def __init__(self, k=5, distance_metric="euclidean"):
-        """
-        Parameters
-        ----------
-        k : int
-            Number of neighbors
-        distance_metric : str
-            "euclidean" or "manhattan"
-        """
+    def __init__(self, k=5, distance_metric="euclidean", task="classification"):
         self.k = k
         self.distance_metric = distance_metric
+        self.task = task  
 
 
     def fit(self, X, y):
-        """
-        KNN training simply stores the dataset.
-        """
         self.X_train = np.array(X)
         self.y_train = np.array(y)
 
 
     def _distance(self, x1, x2):
-        """
-        Compute distance between two vectors.
-        """
 
         if self.distance_metric == "euclidean":
             return np.sqrt(np.sum((x1 - x2) ** 2))
@@ -41,39 +29,33 @@ class KNearestNeighbors(BaseModel):
 
 
     def _predict_single(self, x):
-        """
-        Predict the label for a single sample.
-        """
 
         distances = []
 
         for i in range(len(self.X_train)):
-
             d = self._distance(x, self.X_train[i])
             distances.append((d, self.y_train[i]))
 
-        # sort neighbors by distance
+        # sort by distance
         distances.sort(key=lambda item: item[0])
 
-        # take the k closest neighbors
         neighbors = distances[:self.k]
+        neighbor_values = np.array([label for _, label in neighbors])
 
-        # extract labels
-        neighbor_labels = np.array([label for _, label in neighbors])
+        if self.task == "classification":
+            labels, counts = np.unique(neighbor_values, return_counts=True)
+            return labels[np.argmax(counts)]
 
-        # majority vote using numpy
-        labels, counts = np.unique(neighbor_labels, return_counts=True)
+        elif self.task == "regression":
+            return np.mean(neighbor_values)
 
-        return labels[np.argmax(counts)]
+        else:
+            raise ValueError("Unsupported task type")
 
 
     def predict(self, X):
-        """
-        Predict labels for multiple samples.
-        """
 
         X = np.array(X)
-
         predictions = []
 
         for x in X:

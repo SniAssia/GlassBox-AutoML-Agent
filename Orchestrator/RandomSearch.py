@@ -1,5 +1,3 @@
-import numpy as np
-#soufane note: you have to import from yourbase model.
 class RandomSearch:
     def __init__(self, model_class, param_distributions, n_iter=10, seed=42):
         self.model_class = model_class
