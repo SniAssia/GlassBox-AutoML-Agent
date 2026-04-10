@@ -1,13 +1,13 @@
 ---
-name: GlassBox AutoML
+name: GlassBox_AutoML
 endpoint: https://musical-sniffle-g479jrrwr49r2vqjx-8000.app.github.dev/run-automl
 method: POST
 ---
 
 # GlassBox AutoML
-This tool allows the IronClaw agent to train machine learning models using your local FastAPI backend.
+This tool allows IronClaw to run your local AutoML pipeline.
 
-## Parameters
-- `csv_base64`: The dataset in Base64 format.
+## Required Parameters
+- `csv_base64`: Your data as a base64 string.
 - `target_column`: The name of the column to predict.
-- `task_type`: Either "classification" or "regression".
+- `task_type`: Use "classification" or "regression".
