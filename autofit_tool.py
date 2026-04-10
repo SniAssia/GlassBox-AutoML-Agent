@@ -18,41 +18,52 @@ def run_autofit(csv_base64, target_column, task_type='classification'):
         data, headers = parse_csv_bytes(csv_bytes)
         target_index = headers.index(target_column)
 
-        # 1. DÉFINITION DU ZOO DE MODÈLES
-        # On définit les modèles et leurs grilles d'hyperparamètres respectives
-        model_configs = [
+        # 1. DÉFINITION DU ZOO DE MODÈLES AVEC FILTRE DE TÂCHE
+        all_configs = [
             {
                 "class": LogisticRegression,
+                "tasks": ["classification"],
                 "params": {'lr': [0.01, 0.1, 0.5], 'n_epochs': [100, 500]}
             },
             {
                 "class": DecisionTree,
+                "tasks": ["classification", "regression"],
                 "params": {'max_depth': [3, 5, 10], 'min_samples_split': [2, 5]}
             },
             {
-        "class": RandomForest,
-        "params": {
-            "n_trees": [10, 50],          # <--- Changé de n_estimators à n_trees
-            "max_depth": [5, 10, None],   # Correspond à ton __init__
-            "min_samples_split": [2, 5]    # Correspond à ton __init__
-        }
-    },
-            {
-                "class": GaussianNaiveBayes,
-                "params": {} # Pas de tuning pour NaiveBayes
+                "class": RandomForest,
+                "tasks": ["classification", "regression"],
+                "params": {
+                    "n_trees": [10, 50],
+                    "max_depth": [5, 10, 20],
+                    "min_samples_split": [2, 5]
+                }
             },
             {
-                "class":KNearestNeighbors,
+                "class": GaussianNaiveBayes,
+                "tasks": ["classification"],
+                "params": {}
+            },
+            {
+                "class": KNearestNeighbors,
+                "tasks": ["classification", "regression"],
                 "params": {'k': [3, 5, 7]}
             }
         ]
+
+        # --- FILTRAGE AUTOMATIQUE ---
+        # On ne garde que les modèles compatibles avec la tâche demandée
+        model_configs = [m for m in all_configs if task_type in m["tasks"]]
+
+        if not model_configs:
+            return json.dumps({"status": "failed", "error": f"Aucun modèle disponible pour la tâche: {task_type}"})
 
         best_overall_results = None
         max_score = -1.0
 
         # 2. LA BOUCLE DE COMPÉTITION
         for config in model_configs:
-            print(f"--- Évaluation de : {config['class'].__name__} ---")
+            print(f"--- Évaluation de : {config['class'].__name__} (Task: {task_type}) ---")
             
             search_strategy = RandomSearch(
                 model_class=config['class'], 
@@ -63,7 +74,7 @@ def run_autofit(csv_base64, target_column, task_type='classification'):
             cv = KFoldCV(n_splits=3)
             automl = GlassBoxAutoML(search_strategy, cv)
 
-            # L'orchestrateur exécute le pipeline complet pour ce modèle
+            # L'orchestrateur reçoit la tâche pour adapter les calculs (Gini vs MSE)
             current_results = automl.fit_end_to_end(data, target_index, task=task_type)
             
             # 3. MISE À JOUR DU CHAMPION
