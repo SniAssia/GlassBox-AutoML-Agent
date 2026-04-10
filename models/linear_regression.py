@@ -54,8 +54,9 @@ class LinearRegression(BaseModel):
             self.w_ = self.w_ - self.lr * self._gradient(X, y)
 
     def _fit_normal(self, X, y):
-        # closed form : w = (X.T @ X)^-1 @ X.T @ y
-        self.w_ = np.linalg.inv(X.T @ X) @ X.T @ y
+        # Use the Moore-Penrose pseudoinverse so collinear features do not
+        # crash the closed-form solver with a singular matrix error.
+        self.w_ = np.linalg.pinv(X) @ y
 
     def fit(self, X, y):
         # X : 2D numerical ndarray of shape (m, n)
