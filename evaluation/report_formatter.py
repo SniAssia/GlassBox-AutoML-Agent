@@ -29,6 +29,43 @@ def _target_preview(y, limit=5):
     return preview
 
 
+def _format_tried_models(task, tried_models):
+    formatted = []
+    for item in tried_models:
+        if "error" in item:
+            formatted.append(item)
+            continue
+
+        if task == "regression":
+            formatted.append(
+                {
+                    "model_name": item["model_name"],
+                    "cv_mse": float(-item["cv_score"]),
+                    "ranking_score": float(item["cv_score"]),
+                    "best_params": item["best_params"],
+                }
+            )
+        else:
+            formatted.append(item)
+    return formatted
+
+
+def _format_best_model_summary(task, selection_report, metrics):
+    summary = {
+        "name": selection_report["best_model_name"],
+        "best_params": selection_report["best_params"],
+        "train_metrics": metrics,
+    }
+
+    if task == "regression":
+        summary["cv_mse"] = float(-selection_report["best_score"])
+        summary["ranking_score"] = float(selection_report["best_score"])
+    else:
+        summary["cv_score"] = float(selection_report["best_score"])
+
+    return summary
+
+
 def build_final_report(
     csv_path,
     target_column,
@@ -76,14 +113,9 @@ def build_final_report(
         "search_summary": {
             "strategy": selection_report["search_strategy"],
             "cv_splits": selection_report["cv_splits"],
-            "tried_models": selection_report["tried_models"],
+            "tried_models": _format_tried_models(task, selection_report["tried_models"]),
         },
-        "best_model": {
-            "name": selection_report["best_model_name"],
-            "cv_score": float(selection_report["best_score"]),
-            "best_params": selection_report["best_params"],
-            "train_metrics": metrics,
-        },
+        "best_model": _format_best_model_summary(task, selection_report, metrics),
         "explainability": explainability,
         "warnings": [],
     }
