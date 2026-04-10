@@ -1,0 +1,13 @@
+{
+    "name": "glassbox_automl",
+    "description": "Exécute un pipeline complet : nettoyage, scaling et recherche du meilleur modèle ML.",
+    "endpoint": "http://localhost:8000/run-automl",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "csv_base64": { "type": "string" },
+        "target_column": { "type": "string" },
+        "task_type": { "type": "string", "enum": ["classification", "regression"] }
+      }
+    }
+  }

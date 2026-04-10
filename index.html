@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GlassBox AutoML - IronClaw Agent</title>
+</head>
+
+<body>
+    <h1>🤖 IronClaw Agent - Interface de Test</h1>
+    <input type="file" id="csvFile" accept=".csv">
+    <button onclick="startAnalysis()">Lancer l'AutoML</button>
+    <pre id="output">En attente d'un fichier...</pre>
+
+    <script type="module">
+        import init, { run_automl_bridge } from './pkg/glassbox_ironclaw_bridge.js';
+
+        window.startAnalysis = async () => {
+            const fileInput = document.getElementById('csvFile');
+            const output = document.getElementById('output');
+
+            if (fileInput.files.length === 0) {
+                alert("Choisis un fichier CSV d'abord !");
+                return;
+            }
+
+            output.innerText = "⏳ Initialisation de l'Agent IronClaw (WASM)...";
+            await init();
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64Data = e.target.result.split(',')[1];
+                output.innerText = "📡 IronClaw communique avec le serveur Python...";
+
+                try {
+                    // C'est ici que la magie opère !
+                    const result = await run_automl_bridge(base64Data, "Class", "classification");
+                    output.innerText = "✅ Résultat reçu :\n" + JSON.stringify(result, null, 2);
+                } catch (err) {
+                    output.innerText = "❌ Erreur : " + err;
+                }
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        };
+    </script>
+</body>
+
+</html>
