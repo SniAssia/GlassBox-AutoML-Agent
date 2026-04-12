@@ -9,6 +9,11 @@ class GridSearch:
         self.model_class = model_class
         self.param_grid = param_grid
 
+        if isinstance(model_class, type):
+            self._ctor = model_class
+        else:
+            self._ctor = model_class.__class__
+
     def _all_combinations(self):
         """
         Generate all combinations using only numpy
@@ -34,8 +39,7 @@ class GridSearch:
         for params in self._all_combinations():
             scores = []
             for train_idx, val_idx in cv.split(X):
-                # Instead of model_class(**params), we create a new instance
-                model = self.model_class.__class__(**params)
+                model = self._ctor(**params)
                 model.fit(X[train_idx], y[train_idx])
                 score = model.score(X[val_idx], y[val_idx])
                 scores.append(score)

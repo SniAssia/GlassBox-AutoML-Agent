@@ -10,7 +10,14 @@ runtime: exec
 
 # The command to run. The arguments in {curly_braces} will be
 # filled in by the agent based on the user's request.
-command: C:\Users\salim\Documents\Projects\AI\GlassBox-AutoML-Agent\.venv\Scripts\python.exe autofit.py {file_path} {target_variable}
+#
+# Optional third argument: a JSON string or a path to a JSON config file.
+# If omitted, the tool returns an inspection report + available options.
+# If provided, the tool runs preprocessing + hyperparameter search.
+# Example (JSON inline):
+#   {"seed":42,"preprocess":{"imputer":{"method":"mean"}},"search":{"strategy":"grid","cv":{"n_splits":3},"models":[{"name":"logistic_regression","space":{"lr":[0.01,0.1],"n_epochs":[100,200]}}]}}
+
+command: C:\Users\salim\Documents\Projects\AI\GlassBox-AutoML-Agent\.venv\Scripts\python.exe autofit.py {file_path} {target_variable} {config_json}
 
 # Defines the parameters the agent needs to extract from the user's prompt.
 parameters:
@@ -22,6 +29,10 @@ parameters:
     type: string
     description: The name of the column in the CSV file that the model should learn to predict.
     required: true
+  - name: config_json
+    type: string
+    description: Optional JSON config (or a path to a JSON file) that specifies preprocessing, candidate models, and search strategy.
+    required: false
 ---
 
 ## AutoFit Skill

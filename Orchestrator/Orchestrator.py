@@ -18,6 +18,4 @@ class GlassBoxAutoML:
           2. Returns best score and parameters
         """
         best_score, best_params = self.search_strategy.search(X_clean, y_clean, self.cross_validator)
-        print("Best score:", best_score)
-        print("Best hyperparameters:", best_params)
         return best_score, best_params
