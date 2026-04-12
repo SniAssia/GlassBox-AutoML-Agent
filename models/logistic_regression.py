@@ -20,6 +20,7 @@ class LogisticRegression(BaseModel):
         self.threshold = threshold
         self.weights_  = None   # shape (K, n+1) — one weight vector per class
         self.classes_  = None   # unique class labels learned during fit
+        self.task      = "classification"
 
     def _add_bias(self, X):
         # prepends a column of ones to absorb bias into w (same as LinearRegression)

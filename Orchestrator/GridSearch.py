@@ -34,7 +34,8 @@ class GridSearch:
         for params in self._all_combinations():
             scores = []
             for train_idx, val_idx in cv.split(X):
-                model = self.model_class(**params)
+                # Instead of model_class(**params), we create a new instance
+                model = self.model_class.__class__(**params)
                 model.fit(X[train_idx], y[train_idx])
                 score = model.score(X[val_idx], y[val_idx])
                 scores.append(score)
