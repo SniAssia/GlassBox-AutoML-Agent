@@ -10,16 +10,16 @@ def get_model_registry():
     return {
         "classification": {
             "logistic_regression": LogisticRegression,
-            "decision_tree": DecisionTree,
-            "random_forest": RandomForest,
-            "naive_bayes": GaussianNaiveBayes,
-            "knn": KNearestNeighbors,
+            #"decision_tree": DecisionTree,
+            #"random_forest": RandomForest,
+            #"naive_bayes": GaussianNaiveBayes,
+            #"knn": KNearestNeighbors,
         },
         "regression": {
             "linear_regression": LinearRegression,
-            "decision_tree": DecisionTree,
-            "random_forest": RandomForest,
-            "knn": KNearestNeighbors,
+            #"decision_tree": DecisionTree,
+            #"random_forest": RandomForest,
+            #"knn": KNearestNeighbors,
         },
     }
 
