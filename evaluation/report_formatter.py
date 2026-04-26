@@ -2,7 +2,7 @@ import numpy as np
 
 from evaluation.evaluator import Evaluator
 from evaluation.explainability import build_explainability_report
-
+from confusion import confusion_matrix
 
 def _to_builtin(value):
     if isinstance(value, np.generic):
@@ -66,6 +66,11 @@ def _format_best_model_summary(task, selection_report, metrics):
     return summary
 
 
+# ... (existing imports)
+from confusion import confusion_matrix # Import your new function
+
+# ... (keep helper functions like _to_builtin, _make_json_ready, etc. as they are)
+
 def build_final_report(
     csv_path,
     target_column,
@@ -82,10 +87,20 @@ def build_final_report(
     best_model = selection_report["best_model"]
     y_pred = best_model.predict(X_processed)
 
+    # --- UPDATED SECTION ---
+    conf_matrix_data = None
     if task == "classification":
         metrics = evaluator.classification_report(np.asarray(y), np.asarray(y_pred))
+        
+        # Call your custom confusion matrix function
+        matrix, classes = confusion_matrix(np.asarray(y), np.asarray(y_pred))
+        conf_matrix_data = {
+            "matrix": matrix,
+            "labels": classes
+        }
     else:
         metrics = evaluator.regression_report(np.asarray(y, dtype=float), np.asarray(y_pred, dtype=float))
+    # -----------------------
 
     explainability = build_explainability_report(
         selection_report["best_model_name"],
@@ -117,6 +132,7 @@ def build_final_report(
         },
         "best_model": _format_best_model_summary(task, selection_report, metrics),
         "explainability": explainability,
+        "confusion_matrix": conf_matrix_data, # Added to the report
         "warnings": [],
     }
     return _make_json_ready(report)
