@@ -1,9 +1,8 @@
 [project]
 name = "glassbox-automl-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = ""
 readme = "README.md"
-<<<<<<< HEAD
 requires-python = ">=3.14"
 dependencies = [
     "fastmcp>=3.2.4",
@@ -12,10 +11,4 @@ dependencies = [
     "numpy>=2.4.4",
     "pandas>=3.0.2",
     "scikit-learn>=1.8.0",
-=======
-requires-python = ">=3.11"
-dependencies = [
-    "mcp[cli]>=1.27.0",
-    "numpy>=1.26.0",
->>>>>>> a9930c2 (b)
 ]

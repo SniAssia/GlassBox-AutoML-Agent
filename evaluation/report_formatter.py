@@ -2,7 +2,7 @@ import numpy as np
 
 from evaluation.evaluator import Evaluator
 from evaluation.explainability import build_explainability_report
-from confusion import confusion_matrix
+from evaluation.confusion import confusion_matrix
 
 def _to_builtin(value):
     if isinstance(value, np.generic):
