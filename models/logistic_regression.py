@@ -18,6 +18,7 @@ class LogisticRegression(BaseModel):
         self.n_epochs  = n_epochs
         self.tol       = tol
         self.threshold = threshold
+        self.task      = 'classification'
         self.weights_  = None   # shape (K, n+1) — one weight vector per class
         self.classes_  = None   # unique class labels learned during fit
 

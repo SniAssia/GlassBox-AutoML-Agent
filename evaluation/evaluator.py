@@ -2,8 +2,12 @@ from .metrics_classification import *
 from .metrics_regression import *
 from .roc_auc import roc_auc_score
 from .confusion import confusion_matrix
-import matplotlib.pyplot as plt
 import numpy as np
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:  # plotting is optional for the AutoFit pipeline
+    plt = None
 
 class Evaluator:
     def classification_report(self, y_true, y_pred, y_scores=None):
@@ -28,6 +32,8 @@ class Evaluator:
 
         }
     def display_confusion_matrix(self, y_true, y_pred):
+        if plt is None:
+            raise RuntimeError("matplotlib is required for display_confusion_matrix")
         cm, classes = confusion_matrix(y_true, y_pred)
         _, ax = plt.subplots()
         ax.imshow(cm)
@@ -53,6 +59,8 @@ class Evaluator:
                 print(key," : ",value)
     #interpretation graphique :
     def plot_roc_curve(y_true, y_scores):
+        if plt is None:
+            raise RuntimeError("matplotlib is required for plot_roc_curve")
         order = np.argsort(-y_scores)
         y_true = y_true[order]
         y_scores = y_scores[order]

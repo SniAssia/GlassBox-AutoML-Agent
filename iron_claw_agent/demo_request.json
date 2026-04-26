@@ -1,0 +1,13 @@
+{
+  "csv_path": "data/data.csv",
+  "target_column": "Class",
+  "config": {
+    "numeric_strategy": "mean",
+    "scaler": "standard",
+    "categorical_encoding": "onehot",
+    "search_strategy": "grid",
+    "cv_splits": 3,
+    "random_iter": 5,
+    "seed": 42
+  }
+}

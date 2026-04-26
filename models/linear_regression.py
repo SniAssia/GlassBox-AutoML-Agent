@@ -1,5 +1,5 @@
 # Linear Regression : predicts a continuous target using f(x) = Xw (bias absorbed into w via column of ones)
-# fit : learns weights w using gradient descent or normal equation
+# fit : learns weights w using gradient descent or normal (closed form) equation
 # predict : returns predictions for any X
 # supports solver='gd' (gradient descent) or solver='normal' (closed form normal equation)
 
@@ -54,8 +54,9 @@ class LinearRegression(BaseModel):
             self.w_ = self.w_ - self.lr * self._gradient(X, y)
 
     def _fit_normal(self, X, y):
-        # closed form : w = (X.T @ X)^-1 @ X.T @ y
-        self.w_ = np.linalg.inv(X.T @ X) @ X.T @ y
+        # Use the Moore-Penrose pseudoinverse so collinear features do not
+        # crash the closed-form solver with a singular matrix error.
+        self.w_ = np.linalg.pinv(X) @ y
 
     def fit(self, X, y):
         # X : 2D numerical ndarray of shape (m, n)

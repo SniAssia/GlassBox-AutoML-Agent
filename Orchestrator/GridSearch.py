@@ -31,15 +31,22 @@ class GridSearch:
     def search(self, X, y, cv):
         best_score = -np.inf
         best_params = None
+        last_error = None
         for params in self._all_combinations():
             scores = []
-            for train_idx, val_idx in cv.split(X):
-                model = self.model_class(**params)
-                model.fit(X[train_idx], y[train_idx])
-                score = model.score(X[val_idx], y[val_idx])
-                scores.append(score)
+            try:
+                for train_idx, val_idx in cv.split(X):
+                    model = self.model_class(**params)
+                    model.fit(X[train_idx], y[train_idx])
+                    score = model.score(X[val_idx], y[val_idx])
+                    scores.append(score)
+            except Exception as exc:
+                last_error = exc
+                continue
             mean_score = np.mean(scores)
             if mean_score > best_score:
                 best_score = mean_score
                 best_params = params
+        if best_params is None:
+            raise ValueError(f"GridSearch could not evaluate any valid parameter combination: {last_error}")
         return best_score, best_params

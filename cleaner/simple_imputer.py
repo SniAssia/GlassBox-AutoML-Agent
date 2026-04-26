@@ -1,5 +1,5 @@
 import numpy as np
-from eda.statistics import median, mean, stdev, mode
+from eda.statistics import median, mean, mode
 
 
 class SimpleImputer:
@@ -19,7 +19,7 @@ class SimpleImputer:
     
     def _is_numeric(self, col):
         """this removes missing values from the column, then tries to cast it to float. 
-            If it succeeds → numerical. If it throws an error (e.g. column contains strings like "cat") => categorical."""
+            If it succeeds -> numerical. If it throws an error (e.g. column contains strings like "cat") => categorical."""
         try: 
             col_clean = col[~self._is_missing(col)] # It contains only values that were false when applying _is_mising
             col_clean.astype(float)
