@@ -74,9 +74,11 @@ def run_autofit(csv_path, target_column, config=None):
     X_processed = pipeline.fit_transform(X, feature_names=X_names)
     selector = ModelSelector(
         task=task,
-        search_strategy=config.get("search_strategy", "grid"),
-        cv_splits=config.get("cv_splits", 5),
-        random_iter=config.get("random_iter", 10),
+        search_strategy=config.get("search_strategy", "random"),
+        # 5 
+        cv_splits=config.get("cv_splits"),
+        # 10 
+        random_iter=config.get("random_iter"),
         seed=config.get("seed", 42),
     )
     selection_report = selector.select(X_processed, y)

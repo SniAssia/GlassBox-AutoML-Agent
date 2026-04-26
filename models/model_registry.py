@@ -9,11 +9,19 @@ from models.random_forest import RandomForest
 def get_model_registry():
     return {
         "classification": {
+<<<<<<< HEAD
             "logistic_regression": LogisticRegression,
             #"decision_tree": DecisionTree,
             #"random_forest": RandomForest,
             #"naive_bayes": GaussianNaiveBayes,
             #"knn": KNearestNeighbors,
+=======
+           #"logistic_regression": LogisticRegression,
+            #"decision_tree": DecisionTree,
+            #"random_forest": RandomForest,
+            "naive_bayes": GaussianNaiveBayes,
+           # "knn": KNearestNeighbors,
+>>>>>>> a9930c2 (b)
         },
         "regression": {
             "linear_regression": LinearRegression,
