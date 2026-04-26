@@ -28,7 +28,7 @@ class KNearestNeighbors(BaseModel):
             raise ValueError("Unsupported distance metric")
     
     def _distance(self, x1, x2):
-        """Calculate distance between two points (maintains API compatibility)."""
+        """Calculate distance between two points """
         return self._distance_fn(x1, x2)
     
     def _predict_single(self, x):
