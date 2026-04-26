@@ -1,12 +1,10 @@
-
-
-#  Optimization Module – GlassBox AutoML
+# Optimization Module – GlassBox AutoML
 
 ## 🔷 1. Overview
 
 This module is responsible for **automatically selecting the best model configuration** through hyperparameter tuning.
 
-###  Objective
+### Objective
 
 Find the **best hyperparameters** such that the model:
 
@@ -213,123 +211,12 @@ fit(), predict(), score()
 
 ---
 
-## 🔷 7. KNN Model (Models_Zoo)
-
-### 🔹 What is KNN?
-
-K-Nearest Neighbors is a **supervised learning algorithm** used for:
-
-* Classification
-* Regression
-
-### Core Idea
-
-A point is predicted using its **K nearest neighbors**.
-
----
-
-### 🔹 How it works
-
-1. Choose K
-2. Compute distances
-3. Select K nearest points
-4. Aggregate results
-
----
-
-## 🔷 8. Distance Metrics
-
-### A. Euclidean Distance
-
-```math
-d(x, z) = sqrt(Σ (x_i - z_i)^2)
-```
-
-* Straight-line distance
-* Sensitive to large differences
-
----
-
-### B. Manhattan Distance
-
-```math
-d(x, z) = Σ |x_i - z_i|
-```
-
-* Grid-based movement
-* More robust to outliers
-
----
-
-### 🔴 Key Difference (Intuition)
-
-* Euclidean → direct path (diagonal allowed)
-* Manhattan → grid path (no diagonal)
-
-Example:
-
-* Euclidean = 5
-* Manhattan = 7
-
----
-
-## 🔷 9. Classification vs Regression in KNN
-
-Same algorithm, different aggregation:
-
-| Task           | Method        |
-| -------------- | ------------- |
-| Classification | Majority vote |
-| Regression     | Mean          |
-
-### Example
-
-**Classification**
-
-```
-Neighbors: [0, 1, 1] → Prediction = 1
-```
-
-**Regression**
-
-```
-Neighbors: [10, 12, 14] → Prediction = 12
-```
-
----
-
-## 🔷 10. Why Distance Matters
-
-KNN depends entirely on:
-
-> “Who are the nearest neighbors?”
-
-Changing distance:
-
-* Changes neighbors
-* Changes prediction
-
----
-
-## 🔷 11. Role of Hyperparameters in KNN
-
-* `k`: number of neighbors
-* `distance_metric`: euclidean or manhattan
-
-The optimization module:
-
-* Tests different values
-* Selects the best combination using cross-validation
-
----
-
-## 🔷 12. Final Summary
+## 🔷 7. Final Summary
 
 * KFoldCV → robust evaluation
 * GridSearch → exhaustive search
 * RandomSearch → efficient exploration
 * Orchestrator → pipeline control
-* KNN → distance-based model
 
 ### Final Output
 
@@ -338,7 +225,6 @@ The optimization module:
 
 ---
 
-## 🔷 13. One-Sentence Summary
+## 🔷 8. One-Sentence Summary
 
 > This module automates hyperparameter tuning by combining search strategies with cross-validation to select the best-performing model configuration.
-
